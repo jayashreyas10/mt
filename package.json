@@ -1,0 +1,28 @@
+{
+  "name": "mortgage-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "shared",
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev:backend": "npm --workspace=backend run dev",
+    "dev:frontend": "npm --workspace=frontend run dev",
+    "dev": "concurrently -n backend,frontend -c blue,magenta \"npm:dev:backend\" \"npm:dev:frontend\"",
+    "build:shared": "npm --workspace=shared run build",
+    "build:backend": "npm --workspace=backend run build",
+    "build:frontend": "npm --workspace=frontend run build",
+    "build": "npm run build:shared && npm run build:backend && npm run build:frontend",
+    "test:engine": "npm --workspace=shared test",
+    "test:backend": "npm --workspace=backend test",
+    "test:frontend": "npm --workspace=frontend test",
+    "test": "npm run test:engine && npm run test:backend && npm run test:frontend",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "concurrently": "^9.1.2"
+  }
+}

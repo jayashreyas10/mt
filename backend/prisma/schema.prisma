@@ -1,0 +1,109 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String     @id @default(uuid())
+  email        String     @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  mortgages    Mortgage[]
+}
+
+model Property {
+  id             String    @id @default(uuid())
+  propertyName   String
+  address        String?
+  propertyValue  Float     @default(0)
+  purchasePrice  Float     @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  mortgage       Mortgage?
+}
+
+model Mortgage {
+  id                   String             @id @default(uuid())
+  userId               String
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  propertyId           String?            @unique
+  property             Property?          @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  
+  name                 String
+  originalBalance      Float
+  currentBalance       Float
+  interestRate         Float
+  termYears            Int
+  startDate            DateTime
+  paymentFrequency     String             @default("MONTHLY")
+  scheduledPayment     Float
+  
+  // Escrow / Add-ons
+  propertyTaxMonthly   Float              @default(0)
+  homeInsuranceMonthly Float              @default(0)
+  hoaMonthly           Float              @default(0)
+
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  extraPaymentRules    ExtraPaymentRule[]
+  actualPayments       ActualPayment[]
+  scenarios            Scenario[]
+
+  @@index([userId])
+}
+
+model ExtraPaymentRule {
+  id          String   @id @default(uuid())
+  mortgageId  String
+  mortgage    Mortgage @relation(fields: [mortgageId], references: [id], onDelete: Cascade)
+  
+  type        String   // "RECURRING_MONTHLY" | "ONE_TIME"
+  amount      Float
+  startMonth  Int?     // month index starting from 1
+  startDate   DateTime?
+  targetMonth Int?     // month index for ONE_TIME
+  targetDate  DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([mortgageId])
+}
+
+model ActualPayment {
+  id              String   @id @default(uuid())
+  mortgageId      String
+  mortgage        Mortgage @relation(fields: [mortgageId], references: [id], onDelete: Cascade)
+  
+  paymentDate     DateTime
+  scheduledAmount Float
+  actualAmount    Float
+  principalPaid   Float
+  interestPaid    Float
+  extraPrincipal  Float    @default(0)
+  notes           String?
+
+  createdAt       DateTime @default(now())
+
+  @@index([mortgageId])
+}
+
+model Scenario {
+  id          String   @id @default(uuid())
+  mortgageId  String
+  mortgage    Mortgage @relation(fields: [mortgageId], references: [id], onDelete: Cascade)
+  
+  name        String
+  configJson  String   // JSON payload representing the scenario rules
+
+  createdAt   DateTime @default(now())
+
+  @@index([mortgageId])
+}
