@@ -152,7 +152,7 @@ export class MortgageService {
   ) {
     const mortgage = await this.getMortgageById(userId, mortgageId);
 
-    const rules: EngineExtraPaymentRule[] = mortgage.extraPaymentRules.map(r => ({
+    const rules: EngineExtraPaymentRule[] = (mortgage.extraPaymentRules as any[]).map((r: any) => ({
       id: r.id,
       type: r.type as any,
       amount: r.amount,
@@ -293,12 +293,12 @@ export class MortgageService {
     let totalPrincipalPaid = 0;
     let totalInterestPaid = 0;
 
-    for (const m of mortgages) {
+    for (const m of (mortgages as any[])) {
       totalOriginalLoan += m.originalBalance;
       totalCurrentBalance += m.currentBalance;
       totalMonthlyPayment += (m.scheduledPayment + m.propertyTaxMonthly + m.homeInsuranceMonthly + m.hoaMonthly);
 
-      for (const p of m.actualPayments) {
+      for (const p of (m.actualPayments || [])) {
         totalPrincipalPaid += (p.principalPaid + p.extraPrincipal);
         totalInterestPaid += p.interestPaid;
       }
@@ -316,7 +316,7 @@ export class MortgageService {
       totalPrincipalPaid: Math.round(totalPrincipalPaid * 100) / 100,
       totalInterestPaid: Math.round(totalInterestPaid * 100) / 100,
       overallProgress: Math.round(overallProgress * 10) / 10,
-      mortgages: mortgages.map(m => ({
+      mortgages: (mortgages as any[]).map((m: any) => ({
         id: m.id,
         name: m.name,
         propertyName: m.property?.propertyName || m.name,
