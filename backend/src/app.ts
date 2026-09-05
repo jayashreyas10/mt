@@ -7,10 +7,17 @@ import { config } from './config/index.js';
 import apiRouter from './routes/index.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
+import path from 'path';
+import fs from 'fs';
+
 export const app = express();
 
-// Security headers
-app.use(helmet());
+// Security headers (relaxed CSP for single-origin SPA bundle)
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+);
 
 // CORS configuration
 app.use(
@@ -36,6 +43,25 @@ app.use(cookieParser());
 
 // Mount API routes
 app.use('/api', apiRouter);
+
+// Serve production frontend SPA if built
+const frontendDistPaths = [
+  path.resolve(process.cwd(), 'frontend/dist'),
+  path.resolve(process.cwd(), '../frontend/dist'),
+  path.resolve(__dirname, '../../frontend/dist'),
+  path.resolve(__dirname, '../frontend/dist'),
+];
+
+const distPath = frontendDistPaths.find((p) => fs.existsSync(p));
+if (distPath) {
+  app.use(express.static(distPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.resolve(distPath, 'index.html'));
+  });
+}
 
 // Global error handler
 app.use(errorHandler);

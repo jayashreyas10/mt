@@ -8,6 +8,8 @@
     "build": "tsc && prisma generate",
     "start": "node dist/index.js",
     "prisma:generate": "prisma generate",
+    "prisma:pg": "node scripts/switch-db.js postgresql && prisma generate",
+    "prisma:sqlite": "node scripts/switch-db.js sqlite && prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
     "test": "vitest run"
