@@ -21,6 +21,7 @@ router.get('/', MortgageController.list);
 router.post('/', validateBody(createMortgageSchema), MortgageController.create);
 router.get('/:id', MortgageController.getById);
 router.patch('/:id', validateBody(updateMortgageSchema), MortgageController.update);
+router.put('/:id', validateBody(updateMortgageSchema), MortgageController.update);
 router.delete('/:id', MortgageController.delete);
 
 // Dynamic Amortization schedule calculation
