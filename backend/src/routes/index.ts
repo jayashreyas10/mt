@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import authRoutes from './auth.routes.js';
 import mortgageRoutes from './mortgage.routes.js';
 import paymentRoutes from './payment.routes.js';
@@ -6,7 +6,7 @@ import paymentRoutes from './payment.routes.js';
 const apiRouter = Router();
 
 // Health check
-apiRouter.get('/health', (req, res) => {
+apiRouter.get('/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 

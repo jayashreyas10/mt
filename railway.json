@@ -2,7 +2,16 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "npm run build"
+    "buildCommand": "npm run build",
+    "nixpacksPlan": {
+      "phases": {
+        "install": {
+          "cmds": [
+            "npm ci --include=dev"
+          ]
+        }
+      }
+    }
   },
   "deploy": {
     "startCommand": "npm --workspace=backend run prisma:pg && npx prisma db push --schema=backend/prisma/schema.prisma && npm --workspace=backend run start",

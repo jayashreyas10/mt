@@ -55,7 +55,7 @@ const frontendDistPaths = [
 const distPath = frontendDistPaths.find((p) => fs.existsSync(p));
 if (distPath) {
   app.use(express.static(distPath));
-  app.get('*', (req, res, next) => {
+  app.get('*', (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (req.path.startsWith('/api')) {
       return next();
     }
